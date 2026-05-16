@@ -4,13 +4,17 @@ const REF = 100;
 const TEXT_RES = Math.max(2, Math.ceil(window.devicePixelRatio || 1));
 // Block labels live inside a container scaled by (blockWidth/REF). Since
 // blocks on phones are roughly 60-80px (scale ~0.6-0.8), the source font
-// has to be sized UP so the on-screen rendering is readable.
+// has to be sized UP so the on-screen rendering is readable. Watch out
+// for label overflow — long names like "ALIEN CRYSTAL" must wrap, not
+// bleed into neighboring blocks.
 const LABEL_FONT_SIZE = (function() {
   const w = window.innerWidth;
-  if (w <= 480) return '22px';
-  if (w <= 760) return '18px';
-  return '14px';
+  if (w <= 480) return '18px';
+  if (w <= 760) return '15px';
+  return '13px';
 })();
+// Word-wrap width in source units (block container is REF=100 wide pre-scale)
+const LABEL_WRAP_WIDTH = 86;
 
 export default class Block {
   constructor(scene, x, y, width, height) {
@@ -30,6 +34,7 @@ export default class Block {
       align: 'center',
       fontStyle: 'bold',
       resolution: TEXT_RES,
+      wordWrap: { width: LABEL_WRAP_WIDTH, useAdvancedWrap: true },
     }).setOrigin(0.5);
 
     this.hpBg = scene.add.rectangle(0, REF / 2 - 8, REF - 14, 4, 0x000000, 0.5);
