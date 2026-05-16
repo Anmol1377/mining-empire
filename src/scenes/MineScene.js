@@ -113,19 +113,17 @@ export default class MineScene extends Phaser.Scene {
   animateHammerSlam() {
     if (!this.hammerSprite) return;
     this.tweens.killTweensOf(this.hammerSprite);
-    this.hammerSprite.setAngle(-45);
+    this.hammerSprite.setAngle(0);
+    this.hammerSprite.setY(0);
     this.hammerSprite.setScale(this.hammerBaseScale);
+    // Two rapid piston pumps — like a real jackhammer drilling into the block.
     this.tweens.add({
       targets: this.hammerSprite,
-      angle: { from: -45, to: 0 },
-      duration: 110,
+      y: 14,
+      duration: 45,
+      yoyo: true,
+      repeat: 1,
       ease: 'Quad.easeIn',
-    });
-    this.tweens.add({
-      targets: this.hammerSprite,
-      scale: { from: this.hammerBaseScale * 1.08, to: this.hammerBaseScale },
-      duration: 140,
-      ease: 'Back.easeOut',
     });
   }
 
