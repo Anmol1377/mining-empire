@@ -36,6 +36,28 @@ npm run dev
 
 The game runs at `http://localhost:5173`. Cloud sync and Hall of Fame are disabled without Supabase credentials — everything else works.
 
+## Install as an app (PWA)
+
+The game ships as a [Progressive Web App](https://web.dev/progressive-web-apps/). Once deployed (or running on a real domain), users can install it:
+
+- **Chrome / Edge (desktop):** address bar shows an install icon → click → "Install"
+- **Android Chrome:** menu → "Install app" or "Add to Home screen"
+- **iOS Safari:** Share button → "Add to Home Screen"
+
+Installed, it gets a home-screen icon, launches without browser chrome, and works offline (cached JS/CSS/assets; Supabase calls fail gracefully when offline).
+
+### First-time icon generation
+
+The manifest expects PNG icons at standard sizes. Generate them from the source SVG once:
+
+```bash
+npm run generate:pwa-assets
+```
+
+This creates `public/pwa-192x192.png`, `public/pwa-512x512.png`, `public/maskable-icon-512x512.png`, and `public/apple-touch-icon.png` from `public/icon.svg`. Re-run anytime you change the source icon.
+
+(The PWA still installs without these — but browsers won't auto-prompt for install until proper PNG icons exist.)
+
 ### Enabling cloud sync + Hall of Fame
 
 1. Create a free Supabase project

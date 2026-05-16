@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#0b1020" rx="96"/>
+  <g transform="translate(256 270) rotate(-30)">
+    <!-- Pickaxe head -->
+    <path d="M -160 -32
+             Q -150 -56  -110 -64
+             L  -40 -72
+             Q   60 -64  140 -28
+             Q  150 -16  140  -4
+             Q   60  -20 -40  -8
+             L -110   0
+             Q -150  -8 -160 -32 Z"
+          fill="#ffd66b" stroke="#2a1d00" stroke-width="6" stroke-linejoin="round"/>
+    <!-- Handle -->
+    <rect x="-12" y="-18" width="24" height="220"
+          fill="#8b5a2b" stroke="#2a1d00" stroke-width="6" rx="8"/>
+    <!-- Highlight on head -->
+    <path d="M -120 -52 Q -60 -64 60 -52" fill="none" stroke="#fff0a8" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <!-- "ME" monogram bottom -->
+  <text x="256" y="450" font-family="Menlo, Consolas, monospace"
+        font-size="44" font-weight="700"
+        text-anchor="middle" fill="#ffd66b" letter-spacing="6">MINING</text>
+</svg>

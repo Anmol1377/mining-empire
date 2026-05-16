@@ -6,13 +6,16 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate:pwa-assets": "pwa-assets-generator --preset minimal-2023 public/icon.svg"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
     "phaser": "^3.80.1"
   },
   "devDependencies": {
-    "vite": "^5.4.10"
+    "@vite-pwa/assets-generator": "^0.2.6",
+    "vite": "^5.4.10",
+    "vite-plugin-pwa": "^0.20.5"
   }
 }
