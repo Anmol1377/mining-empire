@@ -361,13 +361,24 @@ body.view-fame #game {
   background: var(--accent);
   color: #2a1d00;
   border: none;
-  padding: 8px 16px;
+  padding: 10px 18px;
   border-radius: 4px;
   font-family: inherit;
   font-size: 13px;
   font-weight: bold;
   cursor: pointer;
   align-self: flex-start;
+  margin-top: 16px;
+  margin-bottom: 6px;
+}
+
+/* Add breathing room above the boost button when it follows the self row */
+.fame-card .fame-row-self + #btn-boost {
+  margin-top: 18px;
+}
+
+/* And space between the boost button and the "next cost" subline */
+#btn-boost + .fame-sub {
   margin-top: 4px;
 }
 
