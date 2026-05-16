@@ -21,7 +21,6 @@ function computeGridDims() {
 }
 const { cols: COLS, rows: ROWS } = computeGridDims();
 const GAP = 10;
-const HEADER_Y = 130;
 const PADDING = 20;
 // Blocks are slightly wider than tall to utilize horizontal space.
 const CELL_ASPECT = 1.25; // width / height
@@ -32,40 +31,58 @@ const MAX_H = 160;
 const AUTO_DRILL_TICK_MS = 1000;
 const TEXT_RES = Math.max(2, Math.ceil(window.devicePixelRatio || 1));
 
+// HUD font sizes scale with viewport — larger and brighter on phones so
+// the stats line is actually readable next to a 400-pixel-wide screen.
+function hudSizes() {
+  const w = window.innerWidth;
+  if (w <= 480) return { coin: '30px', stat: '15px', hudColor: '#cdd9f5', headerY: 150 };
+  if (w <= 760) return { coin: '28px', stat: '14px', hudColor: '#bccae8', headerY: 140 };
+  return { coin: '24px', stat: '12px', hudColor: '#8aa0c0', headerY: 130 };
+}
+const HUD = hudSizes();
+const HEADER_Y = HUD.headerY;
+
 export default class MineScene extends Phaser.Scene {
   constructor() {
     super('MineScene');
   }
 
   create() {
-    this.coinText = this.add.text(20, 14, '', {
+    const statLineH = parseInt(HUD.stat) + 6;
+    let y = 14;
+    this.coinText = this.add.text(20, y, '', {
       fontFamily: 'monospace',
-      fontSize: '24px',
+      fontSize: HUD.coin,
       color: '#ffd66b',
+      fontStyle: 'bold',
       resolution: TEXT_RES,
     });
-    this.statsText = this.add.text(20, 48, '', {
+    y += parseInt(HUD.coin) + 8;
+    this.statsText = this.add.text(20, y, '', {
       fontFamily: 'monospace',
-      fontSize: '12px',
-      color: '#8aa0c0',
+      fontSize: HUD.stat,
+      color: HUD.hudColor,
       resolution: TEXT_RES,
     });
-    this.clickStatsText = this.add.text(20, 66, '', {
+    y += statLineH;
+    this.clickStatsText = this.add.text(20, y, '', {
       fontFamily: 'monospace',
-      fontSize: '12px',
-      color: '#8aa0c0',
+      fontSize: HUD.stat,
+      color: HUD.hudColor,
       resolution: TEXT_RES,
     });
-    this.autoStatsText = this.add.text(20, 84, '', {
+    y += statLineH;
+    this.autoStatsText = this.add.text(20, y, '', {
       fontFamily: 'monospace',
-      fontSize: '12px',
-      color: '#8aa0c0',
+      fontSize: HUD.stat,
+      color: HUD.hudColor,
       resolution: TEXT_RES,
     });
-    this.multText = this.add.text(20, 102, '', {
+    y += statLineH;
+    this.multText = this.add.text(20, y, '', {
       fontFamily: 'monospace',
-      fontSize: '12px',
-      color: '#8aa0c0',
+      fontSize: HUD.stat,
+      color: HUD.hudColor,
       resolution: TEXT_RES,
     });
 

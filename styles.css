@@ -738,15 +738,15 @@ body.view-fame #game {
   #save-bar::-webkit-scrollbar { display: none; }
 
   #save-bar button {
-    padding: 7px 11px;
-    font-size: 12px;
+    padding: 8px 13px;
+    font-size: 14px;
     white-space: nowrap;
     flex-shrink: 0;
-    min-height: 38px;
+    min-height: 40px;
   }
 
   .brand {
-    font-size: 13px;
+    font-size: 15px;
     margin-right: 4px;
     flex-shrink: 0;
     gap: 6px;
@@ -767,8 +767,8 @@ body.view-fame #game {
   /* reopened to keep mobile rules below; see continuation */
 
   #cloud-status {
-    font-size: 11px;
-    padding: 3px 7px;
+    font-size: 13px;
+    padding: 5px 9px;
     flex-shrink: 0;
   }
 
@@ -802,6 +802,13 @@ body.view-fame #game {
     background: rgba(0, 0, 0, 0.4);
     z-index: 55;
   }
+
+  /* Mobile: bump upgrade card text + buy button for readability */
+  #side-panel .upgrade-name { font-size: 16px; }
+  #side-panel .upgrade-desc { font-size: 13px; line-height: 1.5; }
+  #side-panel .upgrade-level { font-size: 13px; }
+  #side-panel .upgrade-buy { font-size: 13px; padding: 7px 14px; min-width: 90px; }
+  #side-panel h2 { font-size: 13px; }
 
   /* Game fills the column */
   #game {

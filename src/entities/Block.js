@@ -2,6 +2,15 @@ import { pickRandomOre } from '../data/ores.js';
 
 const REF = 100;
 const TEXT_RES = Math.max(2, Math.ceil(window.devicePixelRatio || 1));
+// Block labels live inside a container scaled by (blockWidth/REF). Since
+// blocks on phones are roughly 60-80px (scale ~0.6-0.8), the source font
+// has to be sized UP so the on-screen rendering is readable.
+const LABEL_FONT_SIZE = (function() {
+  const w = window.innerWidth;
+  if (w <= 480) return '22px';
+  if (w <= 760) return '18px';
+  return '14px';
+})();
 
 export default class Block {
   constructor(scene, x, y, width, height) {
@@ -16,9 +25,10 @@ export default class Block {
     this.shimmer = scene.add.rectangle(0, 0, REF - 14, REF - 14, 0xffffff, 0.35);
     this.label = scene.add.text(0, 0, '', {
       fontFamily: 'monospace',
-      fontSize: '11px',
+      fontSize: LABEL_FONT_SIZE,
       color: '#ffffff',
       align: 'center',
+      fontStyle: 'bold',
       resolution: TEXT_RES,
     }).setOrigin(0.5);
 
