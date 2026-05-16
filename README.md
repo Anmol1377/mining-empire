@@ -1,2 +1,0 @@
-# mining-empire
-game
