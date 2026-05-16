@@ -10,6 +10,7 @@ import {
 } from '../systems/UpgradeSystem.js';
 import { formatNumber } from '../utils/format.js';
 import Block from '../entities/Block.js';
+import { attachScene as attachAudio, play as playSound } from '../systems/AudioSystem.js';
 
 const COLS = 6;
 const ROWS = 4;
@@ -67,6 +68,7 @@ export default class MineScene extends Phaser.Scene {
     this.scale.on('resize', () => this.layoutGrid());
 
     this.setupHammerCursor();
+    attachAudio(this);
 
     this.time.addEvent({
       delay: AUTO_DRILL_TICK_MS,
@@ -211,8 +213,10 @@ export default class MineScene extends Phaser.Scene {
       if (isCrit) {
         this.spawnFloater(pointer.x, pointer.y, `CRIT! -${formatNumber(damage)}`, '#ff9966', 18);
         this.cameras.main.shake(60, 0.005);
+        playSound('crit');
       } else {
         this.spawnFloater(pointer.x, pointer.y, `-${damage}`, '#dfe6f5', 14);
+        playSound('hit', { volume: 0.4 });
       }
     } else {
       this.awardBreak(state, block, oreBroken, /* heavyShake */ true, isCrit);
@@ -292,6 +296,15 @@ export default class MineScene extends Phaser.Scene {
     }
 
     block.playBreak();
+    if (isCrit) {
+      playSound('crit');
+    } else {
+      playSound('break');
+    }
+    if (oreBroken.value >= 50) {
+      // Big payoff — layer a coin chime on top.
+      playSound('coin', { volume: 0.5 });
+    }
     this.time.delayedCall(block.respawnDelay, () => block.spawn());
   }
 

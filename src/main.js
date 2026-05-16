@@ -12,6 +12,7 @@ import { mountCloudStatus } from './ui/cloudStatus.js';
 import { mountDeveloperModal } from './ui/developerModal.js';
 import { mountDocsModal } from './ui/docsModal.js';
 import { mountSigninModal } from './ui/signinModal.js';
+import { mountMuteButton } from './ui/muteButton.js';
 import { mountMobileLayout } from './ui/mobileLayout.js';
 
 start();
@@ -43,6 +44,7 @@ async function start() {
   mountDeveloperModal();
   mountDocsModal();
   mountSigninModal();
+  mountMuteButton();
   mountMobileLayout();
   initFameRouter();
 

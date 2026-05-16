@@ -2,6 +2,7 @@ import { UPGRADES } from '../data/upgrades.js';
 import { getCost, getLevel, purchase, canAfford, isMaxed } from '../systems/UpgradeSystem.js';
 import { getState, saveNow } from '../systems/SaveSystem.js';
 import { formatNumber } from '../utils/format.js';
+import { play as playSound } from '../systems/AudioSystem.js';
 
 export function mountUpgradePanel() {
   const list = document.getElementById('upgrade-list');
@@ -31,6 +32,7 @@ export function mountUpgradePanel() {
     if (purchase(state, id)) {
       saveNow();
       flashBuy(btn);
+      playSound('upgrade');
       window.dispatchEvent(new CustomEvent('save:changed'));
     }
   });
