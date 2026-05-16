@@ -504,6 +504,88 @@ body.view-fame #game {
   margin: 0;
 }
 
+#developer-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 150;
+  backdrop-filter: blur(2px);
+}
+
+#developer-modal[hidden] { display: none; }
+
+.developer-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 28px 22px;
+  width: 90%;
+  max-width: 340px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+}
+
+.developer-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid var(--accent);
+  background: var(--panel-2);
+  margin: 0 auto 14px;
+  display: block;
+  box-shadow: 0 6px 18px rgba(255, 214, 107, 0.18);
+}
+
+.developer-card h3 {
+  margin: 0 0 4px;
+  color: var(--fg);
+  font-size: 20px;
+  letter-spacing: 0.3px;
+}
+
+.developer-role {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.developer-links {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.developer-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel-2);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  padding: 9px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 120ms ease, color 120ms ease, transform 60ms ease;
+}
+
+.developer-links a:hover {
+  background: var(--border);
+  color: var(--accent);
+}
+
+.developer-links a:active { transform: translateY(1px); }
+.developer-links a svg { flex-shrink: 0; }
+
 #account-modal {
   position: fixed;
   inset: 0;

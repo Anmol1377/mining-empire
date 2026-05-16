@@ -9,6 +9,7 @@ import { mountUpgradePanel } from './ui/upgradePanel.js';
 import { showOfflineBanner } from './ui/offlineBanner.js';
 import { initFameRouter } from './ui/fameView.js';
 import { mountCloudStatus } from './ui/cloudStatus.js';
+import { mountDeveloperModal } from './ui/developerModal.js';
 
 start();
 
@@ -36,6 +37,7 @@ async function start() {
   startAutosave();
   mountSaveButtons();
   mountUpgradePanel();
+  mountDeveloperModal();
   initFameRouter();
 
   const config = {
