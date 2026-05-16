@@ -87,7 +87,8 @@ export default class MineScene extends Phaser.Scene {
 
     this.hammerCursor = this.add.container(-100, -100).setDepth(1000).setVisible(false);
     this.hammerSprite = this.add.image(0, 0, 'cursor-hammer')
-      .setOrigin(0.5, 0.95);
+      .setOrigin(0.5, 0.95)
+      .setAngle(45);
     this.hammerCursor.add(this.hammerSprite);
 
     // Scale to roughly 80px tall regardless of source image size.
@@ -113,13 +114,15 @@ export default class MineScene extends Phaser.Scene {
   animateHammerSlam() {
     if (!this.hammerSprite) return;
     this.tweens.killTweensOf(this.hammerSprite);
-    this.hammerSprite.setAngle(0);
-    this.hammerSprite.setY(0);
+    this.hammerSprite.setAngle(45);
+    this.hammerSprite.setPosition(0, 0);
     this.hammerSprite.setScale(this.hammerBaseScale);
-    // Two rapid piston pumps — like a real jackhammer drilling into the block.
+    // Two rapid piston pumps along the drill axis (45° → down-right).
+    // 10/10 ≈ 14px of travel along the diagonal, matching the prior feel.
     this.tweens.add({
       targets: this.hammerSprite,
-      y: 14,
+      x: 10,
+      y: 10,
       duration: 45,
       yoyo: true,
       repeat: 1,
