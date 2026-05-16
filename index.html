@@ -30,6 +30,7 @@
     <button id="btn-docs" type="button" title="How to play">📖 Docs</button>
     <button id="btn-signin" type="button" title="Sign in / Recover save">👤 Sign in</button>
     <button id="btn-developer" type="button" title="About the developer">Developer</button>
+    <button id="btn-menu" type="button" title="More actions" aria-label="Open menu">⋮</button>
     <input id="file-input" type="file" accept="application/json" hidden />
     <span id="cloud-status" class="cloud-status cloud-muted">Local only</span>
     <span id="save-status" aria-live="polite"></span>
@@ -39,6 +40,21 @@
     <div id="upgrade-list"></div>
   </aside>
   <div id="upgrades-backdrop"></div>
+
+  <aside id="menu-panel" aria-hidden="true">
+    <h2>Menu</h2>
+    <button class="menu-item" data-proxy="btn-fame" type="button">🏆 Hall of Fame</button>
+    <button class="menu-item" data-proxy="btn-cloud-sync" type="button">☁ Save to cloud</button>
+    <button class="menu-item" data-proxy="btn-signin" type="button">👤 Account &amp; Backup</button>
+    <button class="menu-item" data-proxy="btn-docs" type="button">📖 How to play</button>
+    <div class="menu-divider"></div>
+    <button class="menu-item" data-proxy="btn-export" type="button">⬇ Export save</button>
+    <button class="menu-item" data-proxy="btn-import" type="button">⬆ Import save</button>
+    <button class="menu-item menu-danger" data-proxy="btn-reset" type="button">⚠ Reset progress</button>
+    <div class="menu-divider"></div>
+    <button class="menu-item" data-proxy="btn-developer" type="button">👨‍💻 Developer</button>
+  </aside>
+  <div id="menu-backdrop"></div>
   <div id="game"></div>
   <footer id="hint">Tip: tap <b>👤</b> to back up your save with an email + recovery code.</footer>
 

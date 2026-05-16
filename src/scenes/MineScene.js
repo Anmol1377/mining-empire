@@ -12,17 +12,23 @@ import { formatNumber } from '../utils/format.js';
 import Block from '../entities/Block.js';
 import { attachScene as attachAudio, play as playSound } from '../systems/AudioSystem.js';
 
-const COLS = 6;
-const ROWS = 4;
-const GAP = 8;
+// Grid count adapts to viewport at boot: phones get fewer, bigger blocks.
+function computeGridDims() {
+  const w = window.innerWidth;
+  if (w <= 480) return { cols: 4, rows: 5 };
+  if (w <= 760) return { cols: 5, rows: 4 };
+  return { cols: 6, rows: 4 };
+}
+const { cols: COLS, rows: ROWS } = computeGridDims();
+const GAP = 10;
 const HEADER_Y = 130;
-const PADDING = 24;
+const PADDING = 20;
 // Blocks are slightly wider than tall to utilize horizontal space.
 const CELL_ASPECT = 1.25; // width / height
 const MIN_W = 48;
 const MIN_H = 36;
-const MAX_W = 180;
-const MAX_H = 140;
+const MAX_W = 200;
+const MAX_H = 160;
 const AUTO_DRILL_TICK_MS = 1000;
 const TEXT_RES = Math.max(2, Math.ceil(window.devicePixelRatio || 1));
 
@@ -106,7 +112,15 @@ export default class MineScene extends Phaser.Scene {
       this.hammerCursor.setPosition(pointer.x, pointer.y);
     });
 
-    this.input.on('pointerdown', () => this.animateHammerSlam());
+    // On touch, pointermove doesn't fire before pointerdown — make sure the
+    // hammer snaps to the exact touch point before slamming.
+    this.input.on('pointerdown', (pointer) => {
+      if (this.hammerCursor) {
+        this.hammerCursor.setVisible(true);
+        this.hammerCursor.setPosition(pointer.x, pointer.y);
+      }
+      this.animateHammerSlam();
+    });
 
     this.input.on('gameout', () => {
       if (this.hammerCursor) this.hammerCursor.setVisible(false);
