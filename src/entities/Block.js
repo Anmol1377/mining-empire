@@ -27,7 +27,7 @@ export default class Block {
     this.container = scene.add.container(x, y, [this.bg, this.shimmer, this.label, this.hpBg, this.hpFill]);
     this.container.setScale(size / REF);
 
-    this.bg.setInteractive({ useHandCursor: true });
+    this.bg.setInteractive();
     this.bg.on('pointerdown', (pointer) => scene.handleBlockClick(this, pointer));
 
     this.spawn();

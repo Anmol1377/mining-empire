@@ -60,6 +60,8 @@ export default class MineScene extends Phaser.Scene {
     this.buildGrid();
     this.scale.on('resize', () => this.layoutGrid());
 
+    this.setupHammerCursor();
+
     this.time.addEvent({
       delay: AUTO_DRILL_TICK_MS,
       loop: true,
@@ -76,6 +78,55 @@ export default class MineScene extends Phaser.Scene {
     });
 
     this.refreshUi();
+  }
+
+  setupHammerCursor() {
+    if (!this.textures.exists('cursor-hammer')) return;
+
+    this.input.setDefaultCursor('none');
+
+    this.hammerCursor = this.add.container(-100, -100).setDepth(1000).setVisible(false);
+    this.hammerSprite = this.add.image(0, 0, 'cursor-hammer')
+      .setOrigin(0.5, 0.95);
+    this.hammerCursor.add(this.hammerSprite);
+
+    // Scale to roughly 80px tall regardless of source image size.
+    const src = this.textures.get('cursor-hammer').getSourceImage();
+    const targetHeight = 96;
+    const baseScale = src && src.height ? targetHeight / src.height : 0.1;
+    this.hammerSprite.setScale(baseScale);
+    this.hammerBaseScale = baseScale;
+
+    this.input.on('pointermove', (pointer) => {
+      if (!this.hammerCursor) return;
+      this.hammerCursor.setVisible(true);
+      this.hammerCursor.setPosition(pointer.x, pointer.y);
+    });
+
+    this.input.on('pointerdown', () => this.animateHammerSlam());
+
+    this.input.on('gameout', () => {
+      if (this.hammerCursor) this.hammerCursor.setVisible(false);
+    });
+  }
+
+  animateHammerSlam() {
+    if (!this.hammerSprite) return;
+    this.tweens.killTweensOf(this.hammerSprite);
+    this.hammerSprite.setAngle(-45);
+    this.hammerSprite.setScale(this.hammerBaseScale);
+    this.tweens.add({
+      targets: this.hammerSprite,
+      angle: { from: -45, to: 0 },
+      duration: 110,
+      ease: 'Quad.easeIn',
+    });
+    this.tweens.add({
+      targets: this.hammerSprite,
+      scale: { from: this.hammerBaseScale * 1.08, to: this.hammerBaseScale },
+      duration: 140,
+      ease: 'Back.easeOut',
+    });
   }
 
   computeGridLayout() {

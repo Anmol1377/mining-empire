@@ -5,6 +5,10 @@ export default class BootScene extends Phaser.Scene {
     super('BootScene');
   }
 
+  preload() {
+    this.load.svg('cursor-hammer', 'jack-hammer.svg', { width: 256, height: 256 });
+  }
+
   create() {
     // Generate a tiny white particle texture so we don't need an asset file.
     const g = this.add.graphics();
