@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Underground Mining Empire</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="view-game">
+  <header id="save-bar">
+    <strong class="brand">⛏ Mining Empire</strong>
+    <button id="btn-fame" type="button" title="Hall of Fame">Hall of Fame</button>
+    <button id="btn-cloud-sync" type="button" title="Save your progress to the cloud">☁ Save to cloud</button>
+    <button id="btn-export" title="Download your save as a .json file (contains your cloud ID)">Export</button>
+    <button id="btn-import" title="Load a .json save file">Import</button>
+    <button id="btn-reset" title="Wipe localStorage and start fresh (new cloud ID)">Reset</button>
+    <input id="file-input" type="file" accept="application/json" hidden />
+    <span id="cloud-status" class="cloud-status cloud-muted">Local only</span>
+    <span id="save-status" aria-live="polite"></span>
+  </header>
+  <aside id="side-panel">
+    <h2>Upgrades</h2>
+    <div id="upgrade-list"></div>
+  </aside>
+  <div id="game"></div>
+  <footer id="hint">No login — your save file is your account. Lose the file = lose access.</footer>
+
+  <section id="fame-view"></section>
+
+  <div id="offline-banner" hidden role="dialog" aria-modal="true">
+    <div class="offline-card">
+      <h3>Welcome back, miner</h3>
+      <p id="offline-summary"></p>
+      <button id="offline-dismiss" type="button">Collect</button>
+    </div>
+  </div>
+
+  <div id="loading-screen">
+    <div class="loading-content">
+      <h1>⛏ Mining Empire</h1>
+      <p id="loading-status">Booting…</p>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

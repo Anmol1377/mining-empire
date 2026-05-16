@@ -1,0 +1,43 @@
+export const UPGRADES = {
+  drillPower: {
+    name: 'Drill Power',
+    description: '+1 damage per click.',
+    baseCost: 15,
+    costMultiplier: 1.45,
+    effectFromLevel: (level) => 1 + level,
+    effectFormat: (effect) => `${effect} dmg`,
+  },
+  critChance: {
+    name: 'Crit Chance',
+    description: '+2% chance per click to deal 5× damage.',
+    baseCost: 40,
+    costMultiplier: 1.5,
+    maxLevel: 25,
+    effectFromLevel: (level) => Math.min(50, level * 2),
+    effectFormat: (effect) => `${effect}% crit`,
+  },
+  autoDrill: {
+    name: 'Auto-Drill',
+    description: '+1 auto-mine per second on a random block.',
+    baseCost: 60,
+    costMultiplier: 1.6,
+    effectFromLevel: (level) => level,
+    effectFormat: (effect) => `${effect}/sec`,
+  },
+  autoDrillPower: {
+    name: 'Auto-Drill Power',
+    description: '+1 damage per auto-mine tick.',
+    baseCost: 80,
+    costMultiplier: 1.55,
+    effectFromLevel: (level) => 1 + level,
+    effectFormat: (effect) => `${effect} dmg/tick`,
+  },
+  coinMultiplier: {
+    name: 'Smelter',
+    description: '+10% to all coin gains, including offline.',
+    baseCost: 120,
+    costMultiplier: 1.7,
+    effectFromLevel: (level) => 1 + level * 0.1,
+    effectFormat: (effect) => `×${effect.toFixed(1)} coins`,
+  },
+};
