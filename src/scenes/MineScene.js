@@ -96,12 +96,7 @@ export default class MineScene extends Phaser.Scene {
       .setOrigin(0.5, 0.95);
     this.hammerCursor.add(this.hammerSprite);
 
-    // Scale to roughly 80px tall regardless of source image size.
-    const src = this.textures.get('cursor-hammer').getSourceImage();
-    const targetHeight = 96;
-    const baseScale = src && src.height ? targetHeight / src.height : 0.1;
-    this.hammerSprite.setScale(baseScale);
-    this.hammerBaseScale = baseScale;
+    this.applyHammerScale();
 
     this.input.on('pointermove', (pointer) => {
       if (!this.hammerCursor) return;
@@ -114,6 +109,22 @@ export default class MineScene extends Phaser.Scene {
     this.input.on('gameout', () => {
       if (this.hammerCursor) this.hammerCursor.setVisible(false);
     });
+
+    this.scale.on('resize', () => this.applyHammerScale());
+  }
+
+  applyHammerScale() {
+    if (!this.hammerSprite) return;
+    const src = this.textures.get('cursor-hammer').getSourceImage();
+    // Smaller hammer on narrow screens so it doesn't cover multiple blocks.
+    const w = this.scale.width;
+    let targetHeight;
+    if (w <= 480) targetHeight = 52;
+    else if (w <= 760) targetHeight = 68;
+    else targetHeight = 96;
+    const baseScale = src && src.height ? targetHeight / src.height : 0.1;
+    this.hammerSprite.setScale(baseScale);
+    this.hammerBaseScale = baseScale;
   }
 
   animateHammerSlam() {
