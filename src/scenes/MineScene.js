@@ -87,8 +87,7 @@ export default class MineScene extends Phaser.Scene {
 
     this.hammerCursor = this.add.container(-100, -100).setDepth(1000).setVisible(false);
     this.hammerSprite = this.add.image(0, 0, 'cursor-hammer')
-      .setOrigin(0.5, 0.95)
-      .setAngle(45);
+      .setOrigin(0.5, 0.95);
     this.hammerCursor.add(this.hammerSprite);
 
     // Scale to roughly 80px tall regardless of source image size.
@@ -114,18 +113,16 @@ export default class MineScene extends Phaser.Scene {
   animateHammerSlam() {
     if (!this.hammerSprite) return;
     this.tweens.killTweensOf(this.hammerSprite);
-    this.hammerSprite.setAngle(45);
+    this.hammerSprite.setAngle(0);
     this.hammerSprite.setScale(this.hammerBaseScale);
-    // Symmetric piston: oscillate along the drill axis (up-left ↔ down-right).
-    // Start at the "up" extreme so the visible motion crosses through the rest point.
-    this.hammerSprite.setPosition(-8, -8);
+    // Straight vertical piston: lift up, drive down, repeat.
+    this.hammerSprite.setPosition(0, -14);
     this.tweens.add({
       targets: this.hammerSprite,
-      x: 8,
-      y: 8,
-      duration: 38,
+      y: 14,
+      duration: 75,
       yoyo: true,
-      repeat: 2,
+      repeat: 1,
       ease: 'Sine.easeInOut',
       onComplete: () => {
         if (this.hammerSprite) this.hammerSprite.setPosition(0, 0);
