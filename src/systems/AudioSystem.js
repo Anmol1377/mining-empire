@@ -73,17 +73,41 @@ function applyVolume() {
 // Set initial master gain.
 applyVolume();
 
+// Browsers refuse to start an AudioContext until the page sees a user
+// gesture. Resume it on the first click/touch/keypress, then remove the
+// listeners. This silences the "AudioContext was not allowed to start"
+// warning and ensures the first sound actually plays.
+let unlocked = false;
+function unlockAudio() {
+  if (unlocked) return;
+  const ac = ZZFX.audioContext;
+  if (!ac) return;
+  if (ac.state === 'suspended') {
+    ac.resume().catch(() => {});
+  }
+  unlocked = true;
+  removeUnlockListeners();
+}
+function removeUnlockListeners() {
+  window.removeEventListener('pointerdown', unlockAudio);
+  window.removeEventListener('keydown', unlockAudio);
+  window.removeEventListener('touchstart', unlockAudio);
+}
+window.addEventListener('pointerdown', unlockAudio, { passive: true });
+window.addEventListener('keydown', unlockAudio, { passive: true });
+window.addEventListener('touchstart', unlockAudio, { passive: true });
+
 // ---- public API ----
 
 export function play(key) {
   if (settings.muted) return;
+  // Until the user has gestured on the page, Chrome (and others) refuse
+  // to start the AudioContext and log a warning on every call. Skip
+  // silently so the auto-drill doesn't spam the console.
+  if (!unlocked) return;
   const params = SOUNDS[key];
   if (!params) return;
   try {
-    // Web Audio may be suspended until first user gesture; zzfx handles it,
-    // but resume defensively in case.
-    const ac = ZZFX.audioContext;
-    if (ac && ac.state === 'suspended') ac.resume().catch(() => {});
     zzfx(...params);
   } catch (err) {
     console.warn('Audio play failed:', err);
