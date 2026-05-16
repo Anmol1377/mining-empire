@@ -115,18 +115,21 @@ export default class MineScene extends Phaser.Scene {
     if (!this.hammerSprite) return;
     this.tweens.killTweensOf(this.hammerSprite);
     this.hammerSprite.setAngle(45);
-    this.hammerSprite.setPosition(0, 0);
     this.hammerSprite.setScale(this.hammerBaseScale);
-    // Two rapid piston pumps along the drill axis (45° → down-right).
-    // 10/10 ≈ 14px of travel along the diagonal, matching the prior feel.
+    // Symmetric piston: oscillate along the drill axis (up-left ↔ down-right).
+    // Start at the "up" extreme so the visible motion crosses through the rest point.
+    this.hammerSprite.setPosition(-8, -8);
     this.tweens.add({
       targets: this.hammerSprite,
-      x: 10,
-      y: 10,
-      duration: 45,
+      x: 8,
+      y: 8,
+      duration: 38,
       yoyo: true,
-      repeat: 1,
-      ease: 'Quad.easeIn',
+      repeat: 2,
+      ease: 'Sine.easeInOut',
+      onComplete: () => {
+        if (this.hammerSprite) this.hammerSprite.setPosition(0, 0);
+      },
     });
   }
 
