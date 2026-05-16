@@ -79,6 +79,34 @@ export function resetSave() {
   return state;
 }
 
+/**
+ * Replace local save with a server-supplied account: switches cloudId and
+ * (if the server has a saved state) overwrites local progress. Used by
+ * account recovery — "I signed in on a new device, give me my data."
+ */
+export function adoptCloudAccount({ cloudId, email, remoteState }) {
+  if (!cloudId) throw new Error('adoptCloudAccount requires cloudId');
+  const base = createInitialState();
+  base.cloudId = cloudId;
+  base.email = email ?? null;
+  if (remoteState && typeof remoteState === 'object' && Object.keys(remoteState).length > 0) {
+    state = migrate({ ...remoteState, cloudId, email: email ?? remoteState.email ?? null });
+  } else {
+    // No server save yet — keep current progress but under the new cloudId.
+    const current = getState();
+    state = { ...current, cloudId, email: email ?? null };
+  }
+  persist();
+  return state;
+}
+
+export function setAccountEmail(email) {
+  const s = getState();
+  s.email = email ?? null;
+  persist();
+  return s;
+}
+
 function persist() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));

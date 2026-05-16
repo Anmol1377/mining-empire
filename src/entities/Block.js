@@ -4,11 +4,12 @@ const REF = 100;
 const TEXT_RES = Math.max(2, Math.ceil(window.devicePixelRatio || 1));
 
 export default class Block {
-  constructor(scene, x, y, size) {
+  constructor(scene, x, y, width, height) {
     this.scene = scene;
     this.x = x;
     this.y = y;
-    this.size = size;
+    this.width = width;
+    this.height = height ?? width;
     this.respawnDelay = 550;
 
     this.bg = scene.add.rectangle(0, 0, REF, REF, 0xffffff).setStrokeStyle(3, 0xffffff);
@@ -25,7 +26,7 @@ export default class Block {
     this.hpFill = scene.add.rectangle(-(REF - 14) / 2, REF / 2 - 8, REF - 14, 4, 0x7ee787).setOrigin(0, 0.5);
 
     this.container = scene.add.container(x, y, [this.bg, this.shimmer, this.label, this.hpBg, this.hpFill]);
-    this.container.setScale(size / REF);
+    this.applyScale();
 
     this.bg.setInteractive();
     this.bg.on('pointerdown', (pointer) => scene.handleBlockClick(this, pointer));
@@ -33,11 +34,22 @@ export default class Block {
     this.spawn();
   }
 
-  relocate(x, y, size) {
+  // Backwards-compatibility: callers that pass a single size still get a square block.
+  get size() {
+    return Math.min(this.width, this.height);
+  }
+
+  applyScale() {
+    this.container.setScale(this.width / REF, this.height / REF);
+  }
+
+  relocate(x, y, width, height) {
     this.x = x;
     this.y = y;
-    this.size = size;
-    this.container.setPosition(x, y).setScale(size / REF);
+    this.width = width;
+    this.height = height ?? width;
+    this.container.setPosition(x, y);
+    this.applyScale();
   }
 
   spawn() {
@@ -53,9 +65,12 @@ export default class Block {
     this.updateHpBar();
 
     this.container.setAlpha(1);
+    const targetSx = this.width / REF;
+    const targetSy = this.height / REF;
     this.scene.tweens.add({
       targets: this.container,
-      scale: { from: (this.size / REF) * 0.6, to: this.size / REF },
+      scaleX: { from: targetSx * 0.6, to: targetSx },
+      scaleY: { from: targetSy * 0.6, to: targetSy },
       duration: 220,
       ease: 'Back.easeOut',
     });
@@ -81,10 +96,12 @@ export default class Block {
   }
 
   playPunch() {
-    const base = this.size / REF;
+    const baseX = this.width / REF;
+    const baseY = this.height / REF;
     this.scene.tweens.add({
       targets: this.container,
-      scale: { from: base * 0.9, to: base },
+      scaleX: { from: baseX * 0.9, to: baseX },
+      scaleY: { from: baseY * 0.9, to: baseY },
       duration: 90,
       ease: 'Quad.easeOut',
     });
@@ -94,7 +111,8 @@ export default class Block {
     this.scene.tweens.add({
       targets: this.container,
       alpha: 0,
-      scale: (this.size / REF) * 1.25,
+      scaleX: (this.width / REF) * 1.25,
+      scaleY: (this.height / REF) * 1.25,
       duration: 220,
       ease: 'Back.easeIn',
     });

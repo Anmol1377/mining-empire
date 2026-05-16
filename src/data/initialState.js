@@ -16,6 +16,7 @@ export function createInitialState() {
   return {
     version: SAVE_VERSION,
     cloudId: randomId(),
+    email: null,
     meta: {
       createdAt: now,
       lastSavedAt: now,

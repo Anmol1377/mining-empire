@@ -15,7 +15,13 @@ const COLS = 6;
 const ROWS = 4;
 const GAP = 8;
 const HEADER_Y = 130;
-const PADDING = 32;
+const PADDING = 24;
+// Blocks are slightly wider than tall to utilize horizontal space.
+const CELL_ASPECT = 1.25; // width / height
+const MIN_W = 48;
+const MIN_H = 36;
+const MAX_W = 180;
+const MAX_H = 140;
 const AUTO_DRILL_TICK_MS = 1000;
 const TEXT_RES = Math.max(2, Math.ceil(window.devicePixelRatio || 1));
 
@@ -133,37 +139,49 @@ export default class MineScene extends Phaser.Scene {
   computeGridLayout() {
     const availW = this.scale.width - PADDING * 2;
     const availH = this.scale.height - HEADER_Y - PADDING;
-    const sizeByW = (availW - GAP * (COLS - 1)) / COLS;
-    const sizeByH = (availH - GAP * (ROWS - 1)) / ROWS;
-    const size = Math.max(36, Math.min(120, Math.min(sizeByW, sizeByH)));
-    const gridW = COLS * size + (COLS - 1) * GAP;
-    const gridH = ROWS * size + (ROWS - 1) * GAP;
+    const cellW_byW = (availW - GAP * (COLS - 1)) / COLS;
+    const cellH_byH = (availH - GAP * (ROWS - 1)) / ROWS;
+
+    // Prefer width-first with target aspect 1.25:1. If height becomes the
+    // bottleneck, scale both down so blocks still fit vertically.
+    let width = cellW_byW;
+    let height = width / CELL_ASPECT;
+    if (height > cellH_byH) {
+      height = cellH_byH;
+      width = Math.min(cellW_byW, height * CELL_ASPECT);
+    }
+
+    width = Math.max(MIN_W, Math.min(MAX_W, width));
+    height = Math.max(MIN_H, Math.min(MAX_H, height));
+
+    const gridW = COLS * width + (COLS - 1) * GAP;
+    const gridH = ROWS * height + (ROWS - 1) * GAP;
     const originX = (this.scale.width - gridW) / 2;
-    const originY = HEADER_Y + (availH - gridH) / 2;
-    return { size, originX, originY };
+    const originY = HEADER_Y + Math.max(0, (availH - gridH) / 2);
+    return { width, height, originX, originY };
   }
 
   buildGrid() {
-    const { size, originX, originY } = this.computeGridLayout();
+    const { width, height, originX, originY } = this.computeGridLayout();
     for (let row = 0; row < ROWS; row++) {
       for (let col = 0; col < COLS; col++) {
-        const x = originX + col * (size + GAP) + size / 2;
-        const y = originY + row * (size + GAP) + size / 2;
-        this.blocks.push(new Block(this, x, y, size));
+        const x = originX + col * (width + GAP) + width / 2;
+        const y = originY + row * (height + GAP) + height / 2;
+        this.blocks.push(new Block(this, x, y, width, height));
       }
     }
   }
 
   layoutGrid() {
-    const { size, originX, originY } = this.computeGridLayout();
+    const { width, height, originX, originY } = this.computeGridLayout();
     let i = 0;
     for (let row = 0; row < ROWS; row++) {
       for (let col = 0; col < COLS; col++) {
         const block = this.blocks[i++];
         if (!block) continue;
-        const x = originX + col * (size + GAP) + size / 2;
-        const y = originY + row * (size + GAP) + size / 2;
-        block.relocate(x, y, size);
+        const x = originX + col * (width + GAP) + width / 2;
+        const y = originY + row * (height + GAP) + height / 2;
+        block.relocate(x, y, width, height);
       }
     }
   }
@@ -217,7 +235,7 @@ export default class MineScene extends Phaser.Scene {
   autoHit(state, block, damage) {
     const oreBroken = block.hit(damage);
 
-    const spark = this.add.text(block.x, block.y - block.size / 2 - 4, '✦', {
+    const spark = this.add.text(block.x, block.y - block.height / 2 - 4, '✦', {
       fontFamily: 'monospace',
       fontSize: '14px',
       color: '#9aa3c4',

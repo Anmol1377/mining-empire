@@ -9,19 +9,25 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Mining Empire" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="icon" href="/mine-logo.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
   <title>Mining Empire</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body class="view-game">
   <header id="save-bar">
-    <strong class="brand">⛏ Mining Empire</strong>
+    <strong class="brand">
+      <img class="brand-logo" src="/mine-logo.png" alt="" aria-hidden="true" />
+      <!-- <span class="brand-text">Mining Empire</span> -->
+    </strong>
+    <button id="btn-upgrades-toggle" type="button" title="Toggle upgrades panel" aria-label="Toggle upgrades panel">☰ Upgrades</button>
     <button id="btn-fame" type="button" title="Hall of Fame">Hall of Fame</button>
     <button id="btn-cloud-sync" type="button" title="Save your progress to the cloud">☁ Save to cloud</button>
     <button id="btn-export" title="Download your save as a .json file (contains your cloud ID)">Export</button>
     <button id="btn-import" title="Load a .json save file">Import</button>
     <button id="btn-reset" title="Wipe localStorage and start fresh (new cloud ID)">Reset</button>
+    <button id="btn-docs" type="button" title="How to play">📖 Docs</button>
+    <button id="btn-signin" type="button" title="Sign in / Recover save">👤 Sign in</button>
     <button id="btn-developer" type="button" title="About the developer">Developer</button>
     <input id="file-input" type="file" accept="application/json" hidden />
     <span id="cloud-status" class="cloud-status cloud-muted">Local only</span>
@@ -31,6 +37,7 @@
     <h2>Upgrades</h2>
     <div id="upgrade-list"></div>
   </aside>
+  <div id="upgrades-backdrop"></div>
   <div id="game"></div>
   <footer id="hint">No login — your save file is your account. Lose the file = lose access.</footer>
 
@@ -63,6 +70,178 @@
           </svg>
           LinkedIn
         </a>
+      </div>
+    </div>
+  </div>
+
+  <div id="signin-modal" hidden role="dialog" aria-modal="true" aria-labelledby="signin-title">
+    <div class="signin-card">
+      <button class="modal-close" id="signin-close" type="button" aria-label="Close">×</button>
+      <h3 id="signin-title">👤 Account &amp; Backup</h3>
+
+      <div class="signin-tabs" role="tablist">
+        <button type="button" class="signin-tab" data-tab="backup" role="tab" aria-selected="true">Backup this save</button>
+        <button type="button" class="signin-tab" data-tab="restore" role="tab" aria-selected="false">Restore</button>
+      </div>
+
+      <!-- ============ BACKUP TAB ============ -->
+      <div class="signin-pane" data-pane="backup">
+        <div id="signin-backup-intro">
+          <p class="signin-sub">
+            Link this save to your email. We'll give you a one-time
+            <b>backup code</b>. Save it somewhere safe — you'll need
+            <b>email + code</b> to restore on another device.
+          </p>
+          <form id="signin-backup-form" autocomplete="on">
+            <label>Email
+              <input type="email" name="email" maxlength="120" required
+                     inputmode="email" autocomplete="email"
+                     placeholder="you@example.com" />
+            </label>
+            <button type="submit" id="signin-backup-submit">Generate backup code</button>
+          </form>
+        </div>
+
+        <div id="signin-backup-result" hidden>
+          <p class="signin-sub">
+            <b>Save this code.</b> It will not be shown again. We hash it on
+            the server — we cannot read or recover it for you.
+          </p>
+          <div class="backup-code-box">
+            <code id="signin-code-display"></code>
+            <button type="button" id="signin-copy-code" title="Copy code">Copy</button>
+          </div>
+          <p class="signin-sub">
+            Linked to <b id="signin-backed-email"></b>
+          </p>
+          <button type="button" id="signin-done" class="signin-primary">I've saved it — done</button>
+        </div>
+
+        <hr class="signin-sep" id="signin-rotate-sep" hidden />
+        <div id="signin-rotate" hidden>
+          <p class="signin-sub">
+            Already backed up as <b id="signin-current-email"></b>.
+          </p>
+
+          <div id="signin-current-code-box" hidden>
+            <p class="signin-sub">Your current backup code (this device):</p>
+            <div class="backup-code-box">
+              <code id="signin-current-code-text"></code>
+              <button type="button" id="signin-current-copy" title="Copy code">Copy</button>
+            </div>
+          </div>
+
+          <p class="signin-sub" id="signin-no-code-note" hidden>
+            ⚠️ No backup code stored on this device. Your code was shown once
+            when you first set up — if you saved it, you're fine. If not,
+            <b>generate a new one</b> below (the old one stops working).
+          </p>
+
+          <details id="signin-past-details" hidden>
+            <summary>Past codes (this device only)</summary>
+            <ul id="signin-past-list" class="signin-past-list"></ul>
+            <p class="signin-sub">
+              Past codes can't be used to restore — they stop working at rotation.
+              Listed here in case you saved progress with one elsewhere.
+            </p>
+          </details>
+
+          <p class="signin-sub">
+            Lost your code, want to change it, or worried it leaked? Generate
+            a new one — the old one stops working immediately.
+          </p>
+          <button type="button" id="signin-rotate-btn">Generate new backup code</button>
+          <button type="button" id="signin-out-btn">Sign out on this device</button>
+        </div>
+      </div>
+
+      <!-- ============ RESTORE TAB ============ -->
+      <div class="signin-pane" data-pane="restore" hidden>
+        <p class="signin-sub">
+          Enter your email + backup code to <b>replace this device's save</b>
+          with the cloud one.
+        </p>
+        <p class="signin-warn" id="signin-restore-warn">
+          ⚠️ Your current local progress on this device will be overwritten.
+        </p>
+        <form id="signin-restore-form" autocomplete="off">
+          <label>Email
+            <input type="email" name="email" maxlength="120" required
+                   inputmode="email" placeholder="you@example.com" />
+          </label>
+          <label>Backup code
+            <input type="text" name="code" maxlength="14" required
+                   autocapitalize="characters" autocomplete="off"
+                   placeholder="XXXX-XXXX-XXXX" />
+          </label>
+          <button type="submit" id="signin-restore-submit">Restore my save</button>
+        </form>
+      </div>
+
+      <p class="signin-msg" id="signin-msg"></p>
+    </div>
+  </div>
+
+  <div id="docs-modal" hidden role="dialog" aria-modal="true" aria-labelledby="docs-title">
+    <div class="docs-card">
+      <button class="modal-close" id="docs-close" type="button" aria-label="Close">×</button>
+      <h3 id="docs-title">📖 How to Play</h3>
+      <div class="docs-body">
+        <section>
+          <h4>🎯 The Goal</h4>
+          <p>Mine blocks → earn coins → buy upgrades → mine faster → climb the Hall of Fame.</p>
+        </section>
+
+        <section>
+          <h4>⛏ Basics</h4>
+          <ul>
+            <li><b>Click a block</b> to hit it with your hammer. Each hit deals <i>Drill Power</i> damage.</li>
+            <li>Break a block to earn coins. Rarer ores = more coins.</li>
+            <li><b>Ores:</b> Coal (common) · Iron · Gold · Diamond · Alien Crystal (rarest, biggest reward).</li>
+            <li>Blocks respawn shortly after breaking.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>🛠 Upgrades (left panel / ☰ button on mobile)</h4>
+          <ul>
+            <li><b>Drill Power</b> — more damage per click.</li>
+            <li><b>Crit Chance</b> — chance for ×5 damage on a click.</li>
+            <li><b>Auto-Drill</b> — robots that mine for you every second, even offline (up to 8 h).</li>
+            <li><b>Coin Multiplier</b> — bigger reward for every break.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>🔘 Top Bar Buttons</h4>
+          <ul>
+            <li><b>☰ Upgrades</b> — opens the upgrades drawer on mobile.</li>
+            <li><b>Hall of Fame</b> — leaderboard. Pay 5,000 coins to enter your name + a profile link. Spend more coins to boost your score.</li>
+            <li><b>☁ Save to cloud</b> — uploads your save to the cloud. Your save file is your account — keep it safe.</li>
+            <li><b>Export</b> — downloads a <code>.json</code> backup. Includes your cloud ID.</li>
+            <li><b>Import</b> — load a previously exported save (e.g. on a new device).</li>
+            <li><b>Reset</b> — wipes local data and starts fresh with a new cloud ID. <i>Irreversible.</i></li>
+            <li><b>👤 Account &amp; Backup</b> — link this save to an email and get a one-time <b>backup code</b>. On a new device, enter your email + code to restore your progress. Lose the code = lose access — save it somewhere safe.</li>
+            <li><b>📖 Docs</b> — this guide.</li>
+            <li><b>Developer</b> — about the creator.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>💾 Saving &amp; Cloud</h4>
+          <p>The game auto-saves to your browser. Click <b>☁ Save to cloud</b> to back up online — no login needed for the save itself.</p>
+          <p>To recover your save on a different device, set up a <b>backup code</b> via the <b>👤 Account &amp; Backup</b> button: pick an email, we generate a 12-character code, you save it. Then on the new device: enter email + code → save restored. You can rotate the code anytime if you think it leaked.</p>
+        </section>
+
+        <section>
+          <h4>🏆 Hall of Fame Tips</h4>
+          <p>Joining costs <b>5,000 coins</b>. The first boost costs <b>10,000</b>, the next <b>20,000</b>, and so on — each boost doubles. Display names must be unique. Add an Instagram / LinkedIn / X URL so people can find you.</p>
+        </section>
+
+        <section>
+          <h4>📱 Mobile</h4>
+          <p>Tap blocks to mine. Use the <b>☰ Upgrades</b> button to open the upgrades drawer. Long-pressing is disabled to avoid accidental selection.</p>
+        </section>
       </div>
     </div>
   </div>

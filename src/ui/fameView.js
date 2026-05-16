@@ -1,13 +1,14 @@
 import { isConfigured } from '../lib/supabase.js';
 import {
-  fetchTop, fetchMyRank, createEntry, bumpMyEntry,
-  ENTRY_COST, BOOST_COST,
+  fetchTop, fetchMyRank, createEntry, bumpMyEntry, isNameTaken,
+  ENTRY_COST, getNextBoostCost,
 } from '../systems/FameSystem.js';
 import { getState, saveNow } from '../systems/SaveSystem.js';
 import { syncNow } from '../systems/CloudSync.js';
 import { formatNumber } from '../utils/format.js';
 
 const ROOT_ID = 'fame-view';
+let currentBoostCost = getNextBoostCost(0);
 
 export function initFameRouter() {
   document.getElementById('btn-fame')?.addEventListener('click', (e) => {
@@ -16,6 +17,9 @@ export function initFameRouter() {
   });
   window.addEventListener('hashchange', applyRoute);
   window.addEventListener('save:changed', updateAffordability);
+  window.addEventListener('save:reloaded', () => {
+    if (location.hash === '#fame') render();
+  });
   applyRoute();
 }
 
@@ -36,7 +40,7 @@ function updateAffordability() {
   if (joinBtn) joinBtn.disabled = coins < ENTRY_COST;
 
   const boostBtn = document.getElementById('btn-boost');
-  if (boostBtn) boostBtn.disabled = coins < BOOST_COST;
+  if (boostBtn) boostBtn.disabled = coins < currentBoostCost;
 }
 
 async function render() {
@@ -100,7 +104,10 @@ function buildBody(top, mine) {
 
   let actionHtml;
   if (mine) {
-    const canBoost = coins >= BOOST_COST;
+    const boostCount = mine.entry.boost_count ?? 0;
+    const nextCost = getNextBoostCost(boostCount);
+    currentBoostCost = nextCost;
+    const canBoost = coins >= nextCost;
     actionHtml = `
       <div class="fame-card">
         <div class="fame-row fame-row-mine fame-row-self">
@@ -108,12 +115,13 @@ function buildBody(top, mine) {
           <img class="fame-avatar" src="${avatarUrl(mine.entry.avatar_seed)}" alt="" loading="lazy" />
           <div class="fame-info">
             <strong class="fame-name">${escapeHtml(mine.entry.name)}</strong>
-            <span class="fame-sub">${formatNumber(mine.entry.contributions)} contributed</span>
+            <span class="fame-sub">${formatNumber(mine.entry.contributions)} contributed · ${boostCount} boosts</span>
           </div>
         </div>
-        <button id="btn-boost" type="button" ${canBoost ? '' : 'disabled'}>
-          Boost · ${formatNumber(BOOST_COST)} coins
+        <button id="btn-boost" type="button" ${canBoost ? '' : 'disabled'} data-cost="${nextCost}">
+          Boost · ${formatNumber(nextCost)} coins
         </button>
+        <p class="fame-sub">Each boost doubles in cost (next: ${formatNumber(getNextBoostCost(boostCount + 1))}).</p>
         <p class="fame-msg" id="fame-boost-msg"></p>
       </div>
     `;
@@ -188,20 +196,21 @@ function wireForms(mine) {
 
 async function handleBoost() {
   const state = getState();
-  if (state.resources.coins < BOOST_COST) return;
+  const cost = currentBoostCost;
+  if (state.resources.coins < cost) return;
 
-  state.resources.coins -= BOOST_COST;
+  state.resources.coins -= cost;
   saveNow();
   window.dispatchEvent(new CustomEvent('save:changed'));
   setMsg('fame-boost-msg', 'Boosting…', false);
 
   try {
-    await bumpMyEntry(BOOST_COST);
+    await bumpMyEntry(cost);
     syncNow();
     setMsg('fame-boost-msg', 'Boosted!', false);
     await render();
   } catch (err) {
-    state.resources.coins += BOOST_COST;
+    state.resources.coins += cost;
     saveNow();
     window.dispatchEvent(new CustomEvent('save:changed'));
     setMsg('fame-boost-msg', `Failed: ${err.message}`, true);
@@ -226,6 +235,16 @@ async function handleJoin(event) {
     return;
   }
 
+  setMsg('fame-form-msg', 'Checking name…', false);
+  try {
+    if (await isNameTaken(name)) {
+      setMsg('fame-form-msg', 'That name is already taken — try another.', true);
+      return;
+    }
+  } catch {
+    // Network hiccup on the precheck — let the join attempt surface the error.
+  }
+
   state.resources.coins -= ENTRY_COST;
   saveNow();
   window.dispatchEvent(new CustomEvent('save:changed'));
@@ -240,7 +259,7 @@ async function handleJoin(event) {
     state.resources.coins += ENTRY_COST;
     saveNow();
     window.dispatchEvent(new CustomEvent('save:changed'));
-    setMsg('fame-form-msg', `Failed: ${err.message}`, true);
+    setMsg('fame-form-msg', err.message, true);
   }
 }
 

@@ -10,6 +10,9 @@ import { showOfflineBanner } from './ui/offlineBanner.js';
 import { initFameRouter } from './ui/fameView.js';
 import { mountCloudStatus } from './ui/cloudStatus.js';
 import { mountDeveloperModal } from './ui/developerModal.js';
+import { mountDocsModal } from './ui/docsModal.js';
+import { mountSigninModal } from './ui/signinModal.js';
+import { mountMobileLayout } from './ui/mobileLayout.js';
 
 start();
 
@@ -38,6 +41,9 @@ async function start() {
   mountSaveButtons();
   mountUpgradePanel();
   mountDeveloperModal();
+  mountDocsModal();
+  mountSigninModal();
+  mountMobileLayout();
   initFameRouter();
 
   const config = {

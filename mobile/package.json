@@ -1,0 +1,25 @@
+{
+  "name": "mining-empire-mobile",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Android wrapper for Mining Empire (Capacitor)",
+  "scripts": {
+    "build:web": "cd .. && npm run generate:pwa-assets && npm run build",
+    "sync": "npm run build:web && npx cap sync android",
+    "assets": "npx capacitor-assets generate --android",
+    "open:android": "npx cap open android",
+    "run:android": "npm run sync && npx cap run android",
+    "add:android": "npx cap add android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/app": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/splash-screen": "^7.0.0",
+    "@capacitor/status-bar": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^7.0.0"
+  }
+}
