@@ -4,7 +4,7 @@
   "private": true,
   "description": "Android wrapper for Mining Empire (Capacitor)",
   "scripts": {
-    "build:web": "cd .. && npm run generate:pwa-assets && npm run build",
+    "build:web": "cd .. && BUILD_FOR_MOBILE=1 npm run build",
     "sync": "npm run build:web && npx cap sync android",
     "assets": "npx capacitor-assets generate --android",
     "open:android": "npx cap open android",

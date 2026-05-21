@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:background">@null</item>
+    </style>
+
+
+    <!-- Launch theme: use the user's splash image as the window background
+         so the actual splash.png (not an icon) shows during launch.
+         Parent is AppCompat-NoActionBar (NOT Theme.SplashScreen) because
+         the Android 12+ SplashScreen API ignores windowBackground and
+         only allows icon+color, which gave a black screen here. -->
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowBackground">@drawable/splash</item>
+    </style>
+    <color name="colorPrimary">#0b1020</color>
+    <color name="colorPrimaryDark">#0b1020</color>
+    <color name="colorAccent">#ffd66b</color>
+</resources>

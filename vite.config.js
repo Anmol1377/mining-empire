@@ -3,13 +3,19 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // For GitHub Pages, set `GH_PAGES_BASE=/<repo-name>/` when building:
 //   GH_PAGES_BASE=/mining-empire/ npm run build
+//
+// For the Capacitor mobile build, set `BUILD_FOR_MOBILE=1`. Inside the
+// Android WebView the PWA service worker can clash with local-asset
+// loading and leave the app stuck on a blank screen — skip it.
+const IS_MOBILE = process.env.BUILD_FOR_MOBILE === '1';
+
 export default defineConfig({
-  base: process.env.GH_PAGES_BASE || '/',
+  base: IS_MOBILE ? './' : (process.env.GH_PAGES_BASE || '/'),
   build: {
     outDir: 'dist',
     sourcemap: true,
   },
-  plugins: [
+  plugins: IS_MOBILE ? [] : [
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'apple-touch-icon.png', 'favicon.ico'],
